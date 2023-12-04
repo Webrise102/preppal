@@ -52,6 +52,10 @@ let staticPath = path.join(__dirname, "public");
 app.get("/", (req, res) => {
   res.sendFile(path.join(staticPath, "index.html"));
 });
+app.get('/keepalive', (req, res) => {
+    // Perform minimal work here
+    res.status(200).send('Server is alive!');
+});
 app.get("/address", (req, res) => {
   res.sendFile(path.join(staticPath, "address.html"));
 });
@@ -746,6 +750,16 @@ app.post("/check-price", (req, res) => {
       }
     }
   });
+});
+// Set up a cron job to trigger a request every 15 minutes
+cron.schedule('*/15 * * * *', async () => {
+    try {
+        // Replace 'https://yourwebsite.com' with your actual website URL
+        await axios.get('https://preppal.onrender.com/keepalive');
+        console.log('Keep-alive request sent successfully.');
+    } catch (error) {
+        console.error('Error sending keep-alive request:', error.message);
+    }
 });
 
 app.listen(port, () => {
